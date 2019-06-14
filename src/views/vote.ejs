@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script defer src="js/limit.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <h3 class="center-align">
+        <%=data.electionName%>
+    </h3>
+    <form action="/" method="POST">
+        <% data.post.forEach(post => { %>
+            <fieldset>
+                <legend><%=post%></legend>
+                <% let i = data.post.indexOf(post);%>
+                <input type="hidden" class="vLimit" name="vLimit[<%=i%>]" value="<%=data.votingLimit[i]%>">
+                <% data.candidateName[i].forEach(candidate => { 
+                    let j = data.candidateName[i].indexOf(candidate); %>
+                    <p>
+                        <label for="cName<%=i%><%=j%>">
+                            <input type="checkbox" name="cName[<%=i%>][]" id="cName<%=i%><%=j%>" class="cName<%=i%>" value="<%=candidate%>">
+                            <span><%=candidate%></span>
+                        </label>
+                    </p>
+                <%});%>
+            </fieldset>
+        <%});%> 
+        <button type="submit" name="submit" id="submit">Vote</button>
+    </form>  
+    <div id="err">
+    </div>
+</body>
+</html>
