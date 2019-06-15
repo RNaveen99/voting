@@ -1,33 +1,39 @@
-const passport = require('passport');
-const { Strategy } = require('passport-local');
-const { MongoClient } = require('mongodb');
-const debug = require('debug')('app:local.strategy');
+const passport = require("passport");
+const { Strategy } = require("passport-local");
+const { MongoClient } = require("mongodb");
+const { createConnection } = require("../../controllers/mongoController.js")();
+const debug = require("debug")("app:local.strategy");
 
 module.exports = function localStrategy() {
-    passport.use(new Strategy( {
-        usernameField: 'username',
-        passwordField: 'password'
-    }, (username, password, done) => {
-        const url = 'mongodb://localhost:27017';
-        const dbName = 'Voting';
+  passport.use(
+    new Strategy(
+      {
+        usernameField: "username",
+        passwordField: "password"
+      },
+      (username, password, done) => {
         (async function mongo() {
-            let client;
-            try {
-                client = await MongoClient.connect(url, { useNewUrlParser: true});
-                debug('Connected correctly to database');
+          let c;
+          try {
+            let { client, db } = await createConnection();
+            c = client;
+            debug("Connected correctly to database");
 
-                const db = client.db(dbName);
-                const col = db.collection('users');
-                const user = await col.findOne( { $or: [ { username }, { email: username } ] } );
-                if (user.password === password) {
-                    done(null, user);
-                } else {
-                    done(null, false);
-                }
-            } catch (error) {
-                debug(error.stack);
+            const col = db.collection("users");
+            const user = await col.findOne({
+              $or: [{ username }, { email: username }]
+            });
+            if (user.password === password) {
+              done(null, user);
+            } else {
+              done(null, false);
             }
-            client.close();
-        }());
-    }));
-}
+          } catch (error) {
+            debug(error.stack);
+          }
+          c.close();
+        })();
+      }
+    )
+  );
+};

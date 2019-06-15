@@ -1,71 +1,85 @@
-const express = require('express');
-const { MongoClient } = require('mongodb');
-const debug = require('debug')('app:authRoutes');
-const passport = require('passport');
-
+const express = require("express");
+const { MongoClient } = require("mongodb");
+const debug = require("debug")("app:authRoutes");
+const passport = require("passport");
 const authRouter = express.Router();
+const { createConnection } = require("../controllers/mongoController.js")();
 
-function router() {
-    authRouter.route('/signUp')
-        .all((req, res, next) => {
-            if (! req.user) {
-                next();
-            } else {
-                res.redirect('/auth/profile');
-            }
-        })
-        .get((req, res) => {
-            //res.write('ok');
-            res.render('signUp');
-        })
-        .post((req, res) => {
-            const { name, username, email, password } = req.body;
-            const url = 'mongodb://localhost:27017';
-            const dbName = 'Voting';
-            (async function addUser() {
-                let client;
-                try {
-                    client = await MongoClient.connect(url, { useNewUrlParser: true });
-                    debug('Connected correctly to server');
-                    
-                    const db = client.db(dbName);
-                    const col = db.collection('users');
-                    const userAccount = { name, username, email, password };
-                    const results = await col.insertOne(userAccount);
-                    //debug(results);
-                    req.login(results.ops[0], () => {
-                        res.redirect('/auth/profile');
-                    });
-                } catch(error) {
-                    debug(error);
-                }
-                client.close();
-            }());
-        });
-        
-        authRouter.route('/signIn')
-            .get((req, res) => {
-                res.render('signIn');
-            })
-            .post(passport.authenticate('local', {
-                successRedirect: '/auth/profile',
-                failureRedirect: '/auth/signin'
-            }));
+const router = () => {
+  authRouter
+    .route("/signUp")
+    .all((req, res, next) => {
+      if (!req.user) {
+        next();
+      } else {
+        res.redirect("/auth/profile");
+      }
+    })
+    .get((req, res) => {
+      res.render("signUp");
+    })
+    .post((req, res) => {
+      const { name, username, email, password } = req.body;
+      (async function signIn() {
+        let c;
+        try {
+          let { client, db } = await createConnection();
+          c = client;
+          debug("Connected correctly to server");
+          const col = db.collection("users");
+          const userAccount = { name, username, email, password };
+          const results = await col.insertOne(userAccount);
+          //debug(results);
+          req.login(results.ops[0], () => {
+            res.redirect("/auth/profile");
+          });
+        } catch (error) {
+          debug(error);
+        }
+        c.close();
+      })();
+    });
 
-        authRouter.route('/profile')
-            .all((req, res, next) => {
-                if (req.user) {
-                    next();
-                } else {
-                    res.redirect('/auth/signIn');
-                }
-            })
-            .get((req, res) => {
-                let data = req.user;
-                res.render('profile' ,{ data });
-            });
+  authRouter
+    .route("/signIn")
+    .all((req, res, next) => {
+      if (!req.user) {
+        next();
+      } else {
+        res.redirect("/auth/profile");
+      }
+    })
+    .get((req, res) => {
+      res.render("signIn");
+    })
+    .post(
+      passport.authenticate("local", {
+        successRedirect: "/auth/profile",
+        failureRedirect: "/auth/signin"
+      })
+    );
 
-        return authRouter;
-}
+  authRouter
+    .route("/profile")
+    .all((req, res, next) => {
+      if (req.user) {
+        next();
+      } else {
+        res.redirect("/auth/signIn");
+      }
+    })
+    .get((req, res) => {
+      let user = req.user;
+      res.render("profile", { user });
+    });
+
+  authRouter.route("/signOut").get((req, res) => {
+    req.logOut();
+    req.session.destroy();
+    res.redirect("/auth/signIn");
+  });
+  
+  return authRouter;
+};
 
 module.exports = router;

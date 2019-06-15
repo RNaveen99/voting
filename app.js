@@ -7,7 +7,7 @@ const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const { MongoClient } = require('mongodb');
 const passport = require('passport');
-//const uuid = require('uuid/v4');
+const uuid = require('uuid/v4');
 
 //  server created
 const app = express();
@@ -30,11 +30,11 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(session({
-    // genid: (req) => {
-    //     debug('Inside the session middleware');
-    //     debug(req.sessionID);
-    //     return uuid();
-    // },
+    genid: (req) => {
+        debug('Inside the session middleware');
+        debug(req.sessionID);
+        return uuid();
+    },
     secret: 'voting',
     saveUninitialized: false,
     resave: false
@@ -43,110 +43,21 @@ require('./src/config/passport.js')(app);
 
 
 app.use(morgan('tiny'));
+
+const resultRouter = require('./src/routes/resultRoutes')();
+const voteRouter = require('./src/routes/voteRoutes')();
+const authRouter = require('./src/routes/authRoutes')();
+
 app.use((req, res, next) => {
-    res.locals.data = req.session.data;
+    res.locals.isAuthenticated = req.isAuthenticated();
     next();
 });
 
-// const homeRouter = require('./src/routes/homeRoutes');
-// const resultRouter = require('./src/routes/resultRoutes');
-//const voteRouter = require('./src/routes/voteRoutes');
-const authRouter = require('./src/routes/authRoutes')();
-
-// app.use('/home', homeRouter);
-// app.use('/results', resultRouter);
-// app.use('/vote', voteRouter);
+app.get('/', (req, res) => {
+    res.render('home');
+});
+app.use('/results', resultRouter);
+app.use('/vote', voteRouter);
 app.use('/auth', authRouter);
 
-app.get('/', (req, res) => {
-    //debug('Inside homepage calling function');
-    //debug(req.sessionID);
-    //res.send('You hit homepage\n');
-    res.render('voting');
-    if (req.session.data) {
-        req.session.data = null;
-    }
-    //debug(req.session);
-}).post('/', (req, res) => {
 
-    if (!req.session.data) {
-        req.session.data = req.body;
-        res.locals.data = req.session.data;
-        let temp = [];
-        res.locals.data.post.forEach(post => {
-            let postName = post;
-            let i = res.locals.data.post.indexOf(post);
-            let obj = {};
-            let c = [];
-            obj.title = postName;
-            res.locals.data.candidateName[i].forEach(candidate => {
-                let j = res.locals.data.candidateName[i].indexOf(candidate);
-                c.push({ cName: candidate, votes: 0 });
-            });
-            obj.candidates = c;
-            temp.push(obj);
-        });
-        debug(temp);
-        const url = 'mongodb://localhost:27017';
-        const dbName = 'Voting';
-        (async function addUser() {
-            let client;
-            try {
-                client = await MongoClient.connect(url);
-                debug('Connected correctly to server');
-
-                const db = client.db(dbName);
-                const col = db.collection(res.locals.data.electionName);
-                const results = await col.insertMany(temp);
-                const ssdd = await col.insertOne({title:'fsf'});
-                debug(results);
-            } catch (error) {
-                debug(error);
-            }
-            client.close();
-        }());
-    } else if (req.session.data) {
-        debug(req.body);
-        (async function updateVotes() {
-            let client;
-            const url = 'mongodb://localhost:27017';
-            const dbName = 'Voting';
-            try {
-                client = await MongoClient.connect(url);
-                debug('Connected correctly to server');
-
-                const db = client.db(dbName);
-                const col = db.collection(res.locals.data.electionName);
-                
-                res.locals.data.post.forEach(post => {
-                    let postName = post;
-                    let i = res.locals.data.post.indexOf(post);
-                    
-                    req.body.cName[i].forEach(element => {
-                        let j = res.locals.data.candidateName[i].indexOf(element);
-                        let t = "candidates." + j + ".votes";
-                        let result = col.updateOne( {"candidates.cName":  "" + element }  ,   { $inc: { "candidates.$.votes" : 1 } } );
-                        debug(result);
-                    });
-                    // let postName = post;
-                    // let i = res.locals.data.post.indexOf(post);
-                    // let obj = {};
-                    // let c = [];
-                    // obj.title = postName;
-                    // res.locals.data.candidateName[i].forEach(candidate => {
-                    //     let j = res.locals.data.candidateName[i].indexOf(candidate);
-                    //     c.push({ cName: candidate, votes: 0 });
-                    // });
-                    // obj.candidates = c;
-                    // temp.push(obj);
-                });
-            } catch (error) {
-                debug(error);
-            }
-            client.close();
-        }());
-    }
-
-    //res.setHeader('Content-Type', 'text/plain');
-    res.render('vote');
-});

@@ -10,7 +10,8 @@ function initialize() {
     heading.textContent = "Form";
     let submit = setSubmitButton();
 
-    insertElement(body, formWrapper);
+
+    insertElement(document.querySelector('main'), formWrapper);
     insertElement(formWrapper, form);
     insertElement(form, heading);
     insertElement(heading, submit);
@@ -41,7 +42,7 @@ function createLabel(forId, textContent, className = null) {
 function createForm() {
     let form = createElement('form', 'votingForm', 'col s12');
     form.setAttribute('method', 'POST');
-    form.setAttribute('action', '/');
+    form.setAttribute('action', '/vote');
 
     return form;
 }

@@ -1,23 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <script defer src="js/voting.js"></script>
-    <link rel="stylesheet" href="css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
-    
     <meta charset="UTF-8">
+    <script defer src="js/limit.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Voting</title>
+    <title>Document</title>
 </head>
 <body>
-    
+    <h3 class="center-align">
+        <%=data.electionName%>
+    </h3>
+    <form action="/vote" method="POST">
+        <% data.post.forEach(post => { %>
+            <fieldset>
+                <legend><%=post%></legend>
+                <% let i = data.post.indexOf(post);%>
+                <input type="hidden" class="vLimit" name="vLimit[<%=i%>]" value="<%=data.votingLimit[i]%>">
+                <% data.candidateName[i].forEach(candidate => { 
+                    let j = data.candidateName[i].indexOf(candidate); %>
+                    <p>
+                        <label for="cName<%=i%><%=j%>">
+                            <input type="checkbox" name="cName[<%=i%>][]" id="cName<%=i%><%=j%>" class="cName<%=i%>" value="<%=candidate%>">
+                            <span><%=candidate%></span>
+                        </label>
+                    </p>
+                <%});%>
+            </fieldset>
+        <%});%> 
+        <button type="submit" name="submit" id="submit">Vote</button>
+    </form>  
+    <div id="err">
+    </div>
 </body>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
-    <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
-    <script>
-    $(document).ready(function() {
-    M.updateTextFields();
-  });
-    </script>
 </html>
