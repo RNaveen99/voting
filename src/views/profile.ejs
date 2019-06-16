@@ -28,6 +28,12 @@
                                 <td>Email</td>
                                 <td><%=user.email%></td>
                             </tr>
+                            <% if (user.elections.length > 0) { %>
+                            <tr>
+                                <td>Elections:</td>
+                                <td><ul><% user.elections.forEach((ele) => { %> <li><%=ele%></li> <%} ) %> </ul></td>
+                            </tr>
+                            <% }%>
                         </table>
                     </div>
                 </div>

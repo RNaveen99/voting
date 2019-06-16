@@ -60,4 +60,6 @@ app.use('/results', resultRouter);
 app.use('/vote', voteRouter);
 app.use('/auth', authRouter);
 
-
+app.use((req, res, next) => {
+    res.render('errorPage');
+})

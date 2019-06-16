@@ -20,6 +20,7 @@ const router = () => {
     })
     .post((req, res) => {
       const { name, username, email, password } = req.body;
+      const elections = [];
       (async function signIn() {
         let c;
         try {
@@ -27,7 +28,7 @@ const router = () => {
           c = client;
           debug("Connected correctly to server");
           const col = db.collection("users");
-          const userAccount = { name, username, email, password };
+          const userAccount = { name, username, email, password, elections };
           const results = await col.insertOne(userAccount);
           //debug(results);
           req.login(results.ops[0], () => {

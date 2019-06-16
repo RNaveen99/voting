@@ -1,6 +1,6 @@
 const debug = require("debug")("app:voteController");
 const { createConnection } = require("../controllers/mongoController.js")();
-const { MongoClient } = require("mongodb");
+const { MongoClient, ObjectID } = require("mongodb");
 
 const voteController = () => {
   const vote = (req, res) => {
@@ -8,6 +8,7 @@ const voteController = () => {
     if (req.session.hasOwnProperty("data")) {
       delete req.session["data"];
       req.session.save();
+      req.session.destroy();
     }
   };
 
@@ -18,7 +19,7 @@ const voteController = () => {
       data = req.session.data;
 
       let temp = extractElectionData(data);
-      addElectionData(data.electionName, temp);
+      addElectionData(data.electionName, temp, req.user._id);
     } else if (req.session.hasOwnProperty("data")) {
       data = req.session.data;
       debug(req.body);
@@ -53,13 +54,20 @@ function extractElectionData(data) {
   return temp;
 }
 
-async function addElectionData(electionName, temp) {
+async function addElectionData(electionName, temp, userId) {
+  let c;
   try {
-    let { client, db } = await createConnection();
-    const col = db.collection(electionName);
-    const results = await col.insertMany(temp);
-    client.close();
+    const { client, db } = await createConnection();
+    c = client;
+    const col1 = db.collection(electionName);
+    const result1 = await col1.insertMany(temp);
+    const col2 = db.collection("users");
+    const result2 = await col2.updateOne(
+      { _id: new ObjectID(userId) },
+      { $push: { elections: electionName } }
+    );
   } catch (error) {}
+  c.close();
 }
 
 async function updateVotes(data, req) {
