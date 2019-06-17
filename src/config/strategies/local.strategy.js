@@ -15,11 +15,11 @@ module.exports = function localStrategy() {
         (async function mongo() {
           let c;
           try {
-            let { client, db } = await createConnection();
+            const { client, db } = await createConnection();
             c = client;
             debug("Connected correctly to database");
 
-            const col = db.collection("users");
+            const col = await db.collection("users");
             const user = await col.findOne({
               $or: [{ username }, { email: username }]
             });

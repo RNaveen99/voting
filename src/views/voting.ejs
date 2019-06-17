@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <script defer src="js/limit.js"></script>
@@ -8,30 +9,39 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
 </head>
+
 <body>
     <h3 class="center-align">
         <%=data.electionName%>
     </h3>
-    <form action="/vote" method="POST">
-        <% data.post.forEach(post => { %>
-            <fieldset>
-                <legend><%=post%></legend>
-                <% let i = data.post.indexOf(post);%>
-                <input type="hidden" class="vLimit" name="vLimit[<%=i%>]" value="<%=data.votingLimit[i]%>">
-                <% data.candidateName[i].forEach(candidate => { 
+    <div class="row">
+        <form action="/vote" method="POST" class="col s12">
+            <div class="row">
+                <% data.post.forEach(post => { %>
+                <div class="col s6 l4">
+                    <fieldset>
+                        <legend><%=post%></legend>
+                        <% let i = data.post.indexOf(post);%>
+                        <input type="hidden" class="vLimit" name="vLimit[<%=i%>]" value="<%=data.votingLimit[i]%>">
+                        <% data.candidateName[i].forEach(candidate => { 
                     let j = data.candidateName[i].indexOf(candidate); %>
-                    <p>
-                        <label for="cName<%=i%><%=j%>">
-                            <input type="checkbox" name="cName[<%=i%>][]" id="cName<%=i%><%=j%>" class="cName<%=i%>" value="<%=candidate%>">
-                            <span><%=candidate%></span>
-                        </label>
-                    </p>
+                        <p>
+                            <label for="cName<%=i%><%=j%>">
+                                <input type="checkbox" name="cName[<%=i%>][]" id="cName<%=i%><%=j%>" class="cName<%=i%>"
+                                    value="<%=candidate%>">
+                                <span><%=candidate%></span>
+                            </label>
+                        </p>
+                        <%});%>
+                    </fieldset>
+                </div>
                 <%});%>
-            </fieldset>
-        <%});%> 
-        <button type="submit" name="submit" id="submit">Vote</button>
-    </form>  
+            </div>
+            <button type="submit" class="btn " name="submit" id="submit">Vote</button>
+        </form>
+    </div>
     <div id="err">
     </div>
 </body>
+
 </html>

@@ -123,6 +123,7 @@ function createPost() {
             insertElement(div2, div5);
             
             numOfCandidates.addEventListener('change', createCandidates);
+            numOfCandidates.addEventListener('change', validateLimit);
             votingLimit.addEventListener('change', validateVotingLimit);
 
             let div6 = createElement('div', 'candidates' + i, 'row container card-panel black hoverable');
@@ -146,13 +147,14 @@ function createCandidates(e) {
     let div1 = document.querySelector('#candidates' + j);
     if (previous < num) {
         for (let i = previous + 1; i <= num; i++) {
-            let div2 = createElement('div', 'candidate' + j + i, 'candidate input-field');
+            let div2 = createElement('div', 'candidate' + j + i, 'candidate input-field col s12 l4');
             insertElement(div1, div2);
             
             let candidateNameLabel = createLabel('candidateName' + j + i, 'Candidate ' + i + ' : ', 'active');
             insertElement(div2, candidateNameLabel);
     
             let candidateName = createElement('input', 'candidateName' + j + i, 'validate', 'candidateName[' + j + '][]', 'text');
+            candidateName.setAttribute('pattern', '^[a-z ]+$');
             insertElement(div2, candidateName);
         }
     } else if (previous > num && num >= 0) {
@@ -163,11 +165,23 @@ function createCandidates(e) {
     }
 }
 
+function validateLimit(e) {
+    let num = Number(e.target.value);
+    let idName = e.target.id;
+    let j = idName[idName.length - 1];
+    let votingLimit = document.querySelector('#votingLimit' + j);
+    let limit = Number(votingLimit.value);
+    if (num <= limit) {
+        votingLimit.value = num - 1;
+    }
+
+    
+}
 function validateVotingLimit(e) {
     let num = Number(e.target.value);
     let idName = e.target.id;
     let j = idName[idName.length - 1];
-    let numOfCandidates = document.querySelector('#numOfCandidates' + j).value;
+    let numOfCandidates = Number(document.querySelector('#numOfCandidates' + j).value);
     if (num >= numOfCandidates) {
         e.target.value = numOfCandidates - 1;
         if (numOfCandidates - 1 === -1) {

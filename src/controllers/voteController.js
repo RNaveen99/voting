@@ -4,12 +4,13 @@ const { MongoClient, ObjectID } = require("mongodb");
 
 const voteController = () => {
   const vote = (req, res) => {
-    res.render("vote");
     if (req.session.hasOwnProperty("data")) {
       delete req.session["data"];
       req.session.save();
       req.session.destroy();
+      res.redirect('/auth/signIn');
     }
+    res.render("vote");
   };
 
   const voting = (req, res) => {
@@ -71,8 +72,10 @@ async function addElectionData(electionName, temp, userId) {
 }
 
 async function updateVotes(data, req) {
+  let c;
   try {
-    let { client, db } = await createConnection();
+    const { client, db } = await createConnection();
+    c = client;
     const col = db.collection(data.electionName);
 
     //await updateEachPost(data);
@@ -83,8 +86,8 @@ async function updateVotes(data, req) {
       // debug(result);
       // debug('--------------update votes--------------');
     }
-    client.close();
   } catch (error) {}
+  c.close();
 }
 async function updateEachPost(data, req, i, client, db, col, post) {
   try {

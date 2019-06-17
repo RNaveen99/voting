@@ -27,7 +27,7 @@ const router = () => {
           let { client, db } = await createConnection();
           c = client;
           debug("Connected correctly to server");
-          const col = db.collection("users");
+          const col = await db.collection("users");
           const userAccount = { name, username, email, password, elections };
           const results = await col.insertOne(userAccount);
           //debug(results);
