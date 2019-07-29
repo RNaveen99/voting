@@ -12,7 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.19.0",
-    "bootstrap": "^4.3.1",
+    "connect-redis": "^3.4.2",
     "cookie-parser": "^1.4.4",
     "debug": "^4.1.1",
     "ejs": "^2.6.1",
@@ -20,8 +20,15 @@
     "express-session": "^1.16.1",
     "mongodb": "^3.2.7",
     "morgan": "^1.9.1",
+    "nodemon": "^1.19.1",
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",
+    "redis": "^2.8.0",
     "uuid": "^3.3.2"
+  },
+  "devDependencies": {
+    "eslint": "^5.16.0",
+    "eslint-config-airbnb-base": "^13.2.0",
+    "eslint-plugin-import": "^2.18.2"
   }
 }

@@ -1,19 +1,14 @@
-const express = require("express");
-const { MongoClient } = require("mongodb");
-const debug = require("debug")("app:voteRoutes");
-const passport = require("passport");
+const express = require('express');
+const debug = require('debug')('app:voteRoutes');
+const { vote, voting } = require('../controllers/voteController.js')();
+const { ifSignIn } = require('../controllers/helpers/restrictions')();
+
 const voteRouter = express.Router();
-const { vote, voting } = require("../controllers/voteController.js")();
+
 const router = () => {
   voteRouter
-    .route("/")
-    .all((req, res, next) => {
-      if (req.user) {
-        next();
-      } else {
-        res.redirect('/auth/signIn');
-      }
-    })
+    .route('/')
+    .all(ifSignIn)
     .get(vote)
     .post(voting);
 
