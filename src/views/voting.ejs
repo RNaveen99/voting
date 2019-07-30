@@ -15,7 +15,7 @@
         <%=data.electionName%>
     </h3>
     <div class="row">
-        <form action="/vote" method="POST" class="col s12">
+        <form action="/vote" method="POST" class="col s12" id="electionVoting">
             <div class="row">
                 <% data.post.forEach(post => { %>
                 <div class="col s12 l12">
@@ -37,10 +37,10 @@
                 </div>
                 <%});%>
             </div>
-            <button type="submit" class="btn " name="submit" id="submit">Vote</button>
+            <button type="submit" class="btn " name="submitbtn" id="submitbtn">Vote</button>
         </form>
     </div>
-    <div id="err">
+    <div id="err" class="red row">
     </div>
 </body>
 

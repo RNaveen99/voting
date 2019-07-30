@@ -77,7 +77,7 @@ const mongoHelper = () => {
     let result;
     try {
       const { client, db } = await createConnection();
-      c =  client;
+      c = client;
       const col = await db.collection('users');
       result = await col.insertOne(userAccount);
     } catch (error) {}

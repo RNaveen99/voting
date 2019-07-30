@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
 
-  document.querySelector('#submit').addEventListener('click', (e) => {
+  document.querySelector('#submitbtn').addEventListener('click', (e) => {
     let err = false;
     let msg = '';
     for(let i = 0; i < limits.length; i++) {
@@ -47,10 +47,15 @@ document.addEventListener('DOMContentLoaded', () => {
         err = true;
       }
     }
+    e.preventDefault();
     if (err) {
       let node = document.querySelector('#err');
-      node.innerHTML = msg;
-      e.preventDefault();
+      node.innerHTML = `<h4>${msg}</h4>`;
+    } else {
+      const sound = new Audio();
+      sound.src = '/audio/beep.mp3';
+      sound.play();
+      setTimeout(() => { document.forms['electionVoting'].submit(); }, 500);
     }
   });
 });
