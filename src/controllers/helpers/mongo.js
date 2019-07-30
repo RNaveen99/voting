@@ -66,8 +66,9 @@ const mongoHelper = () => {
       const col = await db.collection(ename);
       debug(ename);
       result = await col.find({}, { projection: { title: 1, candidates: 1, _id: 0 } }).toArray();
-      debug(data);
-    } catch (error) {}
+    } catch (error) {
+      debug(error);
+    }
     c.close();
     return result;
   }

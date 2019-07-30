@@ -21,11 +21,13 @@ const voteController = () => {
         return res.redirect('/vote');
       }
       req.session.data = req.body;
+      req.session.data.totalVoter = 0;
       const temp = extractElectionData(req.session.data);
       await addElectionData(req.session.data.electionName, temp, req.user._id);
     } else if (req.session.hasOwnProperty('data')) {
       debug(req.body);
-      await updateVotes(req.session.data, req);
+      req.session.data.totalVoter++;
+      updateVotes(req.session.data, req);
     }
     res.render('voting', { data: req.session.data });
   };
