@@ -25,9 +25,15 @@ const voteController = () => {
       const temp = extractElectionData(req.session.data);
       await addElectionData(req.session.data.electionName, temp, req.user._id);
     } else if (req.session.hasOwnProperty('data')) {
-      debug(req.body);
-      req.session.data.totalVoter++;
-      updateVotes(req.session.data, req);
+      try {
+        //debug(req.body);
+        req.session.data.totalVoter++;
+        updateVotes(req.session.data, req);
+      } catch (error) {
+        debug('==============update Votes called==============');
+        debug(error);
+        debug('=========================================');
+      }
     }
     res.render('voting', { data: req.session.data });
   };

@@ -39,22 +39,33 @@ const mongoHelper = () => {
       for (const post of data.post) {
         await updateEachPost(data, req, col, post);
       }
-    } catch (error) {}
+    } catch (error) {
+      debug('==============update Votes==============');
+      debug(error);
+      debug('=========================================');
+    }
     c.close();
   }
   const updateEachPost = async (data, req, col, post) => {
     try {
       const i = data.post.indexOf(post);
       for (const element of req.body.cName[i]) {
+        debug('=============element======================');
+        debug(element);
+        debug('=========================================');
         let result = await col.updateOne(
           { title: post , 'candidates.cName': element },
           { $inc: { 'candidates.$.votes': 1 } },
         );
         debug('--------------update each post--------------');
-        //debug(result);
+        debug(result.result);
         debug('--------------update each post--------------');
       }
-    } catch (error) {}
+    } catch (error) {
+      debug('==============update Each Post==============');
+      debug(error);
+      debug('=========================================');
+    }
   }
   
   const loadResults = async (ename) => {

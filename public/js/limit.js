@@ -43,19 +43,21 @@ document.addEventListener('DOMContentLoaded', () => {
       if (count < 1) {
         let ele = document.querySelector(`.cName${i}`).parentNode.parentNode.parentNode;
         ele = ele.firstElementChild;
-        msg += `Select at least 1 from ${ele.textContent} <br>`;
+        msg += `Select at least 1 Candidate from ${ele.textContent} <br>`;
         err = true;
       }
     }
     e.preventDefault();
+    const sound = new Audio();
     if (err) {
       let node = document.querySelector('#err');
-      node.innerHTML = `<h4>${msg}</h4>`;
-    } else {
-      const sound = new Audio();
-      sound.src = '/audio/beep.mp3';
+      node.innerHTML = `<b>${msg}</b>`;
+      sound.src = '/audio/beepError.mp3';
       sound.play();
-      setTimeout(() => { document.forms['electionVoting'].submit(); }, 500);
+    } else {
+      sound.src = '/audio/beepSuccess.mp3';
+      sound.play();
+      setTimeout(() => { document.forms['electionVoting'].submit(); }, 700);
     }
   });
 });
